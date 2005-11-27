@@ -13,44 +13,46 @@ URL:		http://mkcdrec.ota.be/
 Requires:	MAKEDEV
 Provides:	perl(mkcdrec-lib.pl)
 %if %{_boot_arch}==ia64
-BuildRequires:	gcc >= 2.96
+BuildRequires:	gcc >= 5:2.96
 Requires:	ash
-Requires:	chkconfig
+Requires:	/sbin/chkconfig
 Requires:	cdrtools
 Requires:	cdrtools-mkisofs
 Requires:	fileutils
 Requires:	mtools
 Requires:	parted >= 1.6
-Requires:	perl-base >= 5.0
+Requires:	perl-base >= 1:5.0
 Requires:	rsync
 Requires:	tar
 Requires:	util-linux >= 2.11
 %endif
 %if %{_boot_arch}==x86_64
-BuildRequires:	gcc >= 2.96
+BuildRequires:	gcc >= 5:2.96
 Requires:	ash
 Requires:	cdrtools
 Requires:	cdrtools-mkisofs
 Requires:	fileutils
-Requires:	perl-base >= 5.0
+Requires:	perl-base >= 1:5.0
 Requires:	rsync
 Requires:	syslinux
 Requires:	tar
 Requires:	util-linux >= 2.11
 %endif
 %if %{_boot_arch}==x86
-BuildRequires:	gcc >= 2.96
+BuildRequires:	gcc >= 5:2.96
 BuildRequires:	syslinux >= 1.60
 Requires:	ash
 Requires:	coreutils
 Requires:	cdrtools
 Requires:	cdrtools-mkisofs
-Requires:	perl-base >= 5.0
+Requires:	perl-base >= 1:5.0
 Requires:	rsync
 Requires:	syslinux
 Requires:	tar
 Requires:	util-linux >= 2.11
 %endif
+Requires(post):	coreutils
+Requires(post):	ed
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_prefix			/var/opt/mkcdrec
@@ -187,6 +189,7 @@ rm -rf $RPM_BUILD_ROOT
 #we add mkcdrec in webmin root's ACL
 if [ -f %{_webmin_access_file} ]; then
 	cp %{_webmin_access_file} %{_webmin_access_file}.beforemkcdrec.sauv
+# FIXME: race possible! (fixed name in world writable dir)
 	ed %{_webmin_access_file} << EOF > /tmp/mkcdrec.log 2>&1
 /root:
 s/root:/root: mkcdrec/
@@ -204,6 +207,7 @@ install -m 750 %{_prefix}/contributions/mkcdrec /usr/sbin/mkcdrec
 # we remove mkcdrec from webmin root's ACL
 
 if [ -f %{_webmin_access_file} ]; then
+# FIXME: race possible! (fixed name in world writable dir)
 	ed %{_webmin_access_file} << EOF > /tmp/mkcdrec.log 2>&1
 s/mkcdrec//g
 w
