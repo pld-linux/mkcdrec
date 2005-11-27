@@ -1,38 +1,62 @@
-%define _prefix /var/opt/mkcdrec
-%define _webmin_root /usr/libexec/webmin
-%define _webmin_access_file /etc/webmin/webmin.acl
-%define _webmin_cache_cile /etc/webmin/module.infos.cache
-%define _boot_arch x86
+%define		_boot_arch		x86
 Summary:	mkCDrec (make CD-ROM Recovery) disaster recovery tool-set
-Summary(pl):	mkCDrec (zrób CD-ROM odzyskyj±cy system)
+Summary(pl):	mkCDrec - zestaw narzêdzi do tworzenia p³yt do odtwarzania systemu po awarii
 Name:		mkcdrec
 Version:	0.8.9
 Release:	0.1
+License:	GPL
+Group:		System/Tools
 Source0:	http://mkcdrec.ota.be/project/mkCDrec_v%{version}.tar.gz
 # Source0-md5:	0cbe2efbd083ce9745c5d5c5cea1c7c2
 ##Source1: busybox-1.01.tar.bz2
 URL:		http://mkcdrec.ota.be/
-License:	GPL
-Group:		System/Tools
-Provides:	perl(mkcdrec-lib.pl)
 Requires:	MAKEDEV
-
+Provides:	perl(mkcdrec-lib.pl)
 %if %{_boot_arch}==ia64
-Prereq:		chkconfig fileutils cdrecord mkisofs tar ash mtools rsync
-Requires:	kernel >= 2.0.0, util-linux >= 2.11, perl >= 5.0, parted >= 1.6
 BuildRequires:	gcc >= 2.96
+Requires:	ash
+Requires:	chkconfig
+Requires:	cdrtools
+Requires:	cdrtools-mkisofs
+Requires:	fileutils
+Requires:	mtools
+Requires:	parted >= 1.6
+Requires:	perl-base >= 5.0
+Requires:	rsync
+Requires:	tar
+Requires:	util-linux >= 2.11
 %endif
 %if %{_boot_arch}==x86_64
-Prereq:		fileutils cdrecord mkisofs tar ash rsync syslinux
-Requires:	kernel >= 2.0.0, util-linux >= 2.11, perl >= 5.0
 BuildRequires:	gcc >= 2.96
+Requires:	ash
+Requires:	cdrtools
+Requires:	cdrtools-mkisofs
+Requires:	fileutils
+Requires:	perl-base >= 5.0
+Requires:	rsync
+Requires:	syslinux
+Requires:	tar
+Requires:	util-linux >= 2.11
 %endif
 %if %{_boot_arch}==x86
-Prereq:		coreutils fileutils cdrecord mkisofs tar ash syslinux rsync
-Requires:	kernel >= 2.0.0, util-linux >= 2.11, perl >= 5.0
-BuildRequires:	syslinux >= 1.60, gcc >= 2.96
+BuildRequires:	gcc >= 2.96
+BuildRequires:	syslinux >= 1.60
+Requires:	ash
+Requires:	coreutils
+Requires:	cdrtools
+Requires:	cdrtools-mkisofs
+Requires:	perl-base >= 5.0
+Requires:	rsync
+Requires:	syslinux
+Requires:	tar
+Requires:	util-linux >= 2.11
 %endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+
+%define		_prefix			/var/opt/mkcdrec
+%define		_webmin_root		/usr/lib/webmin
+%define		_webmin_access_file	/etc/webmin/webmin.acl
+%define		_webmin_cache_cile	/etc/webmin/module.infos.cache
 
 %description
 mkCDrec (Make CDROM Recovery) makes a bootable (El Torito) disaster
@@ -48,25 +72,29 @@ vfat, reiserfs, xfs and jfs filesystems are supported. One Button
 Disaster Recovery (OBDR) is also supported as recovery method.
 
 %description -l pl
-mkCDrec (zrób odzyskuj±cy CDROM) tworzy uruchamialn± (El Torito)
-p³tkê zawieraj± system oraz kilka voluminów kopii danych. Zamiast 
-wielu p³ytek mo¿na pos³u¿yæ siê innym dyskiem, NFSem, kopi± na ta¶mie.
-Po awarii system albo wej¶ciu intruza system mo¿e byæ uruchomiony 
-z p³ytki i przywrócony do pierwotnego stanu.
-mkcdrec wspiera klonowanie systemu. Aktualnie mo¿na u¿ywaæ ext2, ext3, 
-minix, msdos, fat, vfat, reiserfs, xfs and jfs jako systemów plików.
-Metoda zwana 'One Button Disaster Recovery (OBDR)' jest równie¿ wpierana.
+mkCDrec (Make CDROM Recovery) tworzy uruchamialny (El Torito) obraz
+zawieraj±cy kopiê zapasow± systemu na jednej lub wiêkszej liczbie
+p³ytek CD-ROM. Zamiast wielu p³ytek mo¿na pos³u¿yæ siê innym dyskiem,
+NFS-em lub kopi± na ta¶mie. Po awarii systemu albo wej¶ciu intruza
+system mo¿e byæ uruchomiony z p³ytki i przywrócony do pierwotnego
+stanu. mkcdrec obs³uguje klonowanie systemu, pozwalaj±ce na
+odtworzenie dysku z innego dysku (dysk docelowy nie musi byæ tego
+samego rozmiaru, rozk³ad partycji jest przeliczany). Aktualnie mo¿na
+u¿ywaæ systemów plików ext2, ext3, minix, msdos, fat, vfat, reiserfs,
+xfs i jfs. Metoda zwana "One Button Disaster Recovery" (OBDR) jest
+równie¿ wpierana.
 
 %prep
 %setup -q -n mkcdrec
 ##%setup -n mkcdrec -a 1
+
+find . -name CVS | xargs rm -Rf
 
 %build
 %{__make} -f Makefile.%{_boot_arch} build
 
 %install
 rm -rf $RPM_BUILD_ROOT
-find . -name CVS | xargs rm -Rfv
 
 install -d $RPM_BUILD_ROOT%{_prefix}/busybox/applets
 install -d $RPM_BUILD_ROOT%{_bindir}
@@ -129,10 +157,7 @@ for fname in `find . -type f -maxdepth 1`; do
 	install -m 755  $fname $RPM_BUILD_ROOT%{_prefix}/$fname
 done
 
-install -m 755 doc/mkcdrec.8 $RPM_BUILD_ROOT%{_mandir}/man8
-
-gzip -c $RPM_BUILD_ROOT%{_mandir}/man8/mkcdrec.8 > \
-	$RPM_BUILD_ROOT%{_mandir}/man8/mkcdrec.8.gz
+install -m 644 doc/mkcdrec.8 $RPM_BUILD_ROOT%{_mandir}/man8
 
 for file in \
     $RPM_BUILD_ROOT%{_prefix}/.cvsignore \
@@ -142,7 +167,6 @@ for file in \
 ; do rm -f $file ; done
 
 # installation of webmin module
-
 
 [ ! -d $RPM_BUILD_ROOT%{_webmin_root}/mkcdrec ] && install -d -m 755 $RPM_BUILD_ROOT%{_webmin_root}/mkcdrec
 # we copy files in webmin directory
@@ -155,41 +179,9 @@ for file in \
 		install -m 755 $fname $RPM_BUILD_ROOT%{_webmin_root}/`echo $fname | sed -e 's/webmin/mkcdrec/'`
 	done
 #fi
-%files
-%defattr(644,root,root,755)
-%doc Changelog README COPYING
-%doc %{_prefix}/doc
-%config %{_prefix}/Config.sh
-%{_prefix}/VERSION
-%{_prefix}/.config.bb
-%{_prefix}/busybox
-%attr(755,root,root) %{_bindir}
-%{_prefix}/contributions
-%{_prefix}/scripts
-%{_prefix}/modules
-%{_prefix}%{_sysconfdir}
-%{_prefix}/usr
-%{_prefix}/linuxrc
-%{_prefix}/linuxrc_find_and_prep_root
-%{_prefix}/linuxrc_post
-%{_prefix}/linuxrc_pre
-%{_prefix}/Makefile
-%{_prefix}/Makefile.new-powermac
-%{_prefix}/Makefile.x86
-%{_prefix}/Makefile.sparc
-%{_prefix}/Makefile.ia64
-%{_prefix}/Makefile.x86_64
-%{_mandir}/man8/*
-%{_webmin_root}/mkcdrec/help.cgi
-%{_webmin_root}/mkcdrec/images/icon
-%{_webmin_root}/mkcdrec/images/icon.gif
-%{_webmin_root}/mkcdrec/index.cgi
-%{_webmin_root}/mkcdrec/lang/en
-%{_webmin_root}/mkcdrec/lang/fr
-%{_webmin_root}/mkcdrec/mkcdrec-lib.pl
-%{_webmin_root}/mkcdrec/module.info
-%{_webmin_root}/mkcdrec/save.cgi
-%{_webmin_root}/mkcdrec/README.webmin
+
+%clean
+rm -rf $RPM_BUILD_ROOT
 
 %post
 #we add mkcdrec in webmin root's ACL
@@ -220,3 +212,43 @@ EOF
 fi
 # rm the mkcdrec wrapper
 rm -f /usr/sbin/mkcdrec
+
+%files
+%defattr(644,root,root,755)
+%doc Changelog README COPYING
+%dir %{_prefix}
+%doc %{_prefix}/doc
+%config %{_prefix}/Config.sh
+%{_prefix}/VERSION
+%{_prefix}/.config.bb
+%{_prefix}/busybox
+%attr(755,root,root) %{_bindir}
+%{_prefix}/contributions
+%{_prefix}/scripts
+%{_prefix}/modules
+%{_prefix}/etc
+%{_prefix}/usr
+%{_prefix}/linuxrc
+%{_prefix}/linuxrc_find_and_prep_root
+%{_prefix}/linuxrc_post
+%{_prefix}/linuxrc_pre
+%{_prefix}/Makefile
+%{_prefix}/Makefile.new-powermac
+%{_prefix}/Makefile.x86
+%{_prefix}/Makefile.sparc
+%{_prefix}/Makefile.ia64
+%{_prefix}/Makefile.x86_64
+%{_mandir}/man8/*
+%dir %{_webmin_root}/mkcdrec
+%{_webmin_root}/mkcdrec/help.cgi
+%dir %{_webmin_root}/mkcdrec/images
+%{_webmin_root}/mkcdrec/images/icon
+%{_webmin_root}/mkcdrec/images/icon.gif
+%{_webmin_root}/mkcdrec/index.cgi
+%dir %{_webmin_root}/mkcdrec/lang
+%{_webmin_root}/mkcdrec/lang/en
+%{_webmin_root}/mkcdrec/lang/fr
+%{_webmin_root}/mkcdrec/mkcdrec-lib.pl
+%{_webmin_root}/mkcdrec/module.info
+%{_webmin_root}/mkcdrec/save.cgi
+%{_webmin_root}/mkcdrec/README.webmin
