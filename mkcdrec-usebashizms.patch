@@ -1,0 +1,110 @@
+diff -ur /home/users/hunter/rpm/BUILD/mkcdrec/Config.sh /home/users/hunter/rpm/BUILD/mkcdrec/Config.sh
+--- /home/users/hunter/rpm/BUILD/mkcdrec/Config.sh	2005-11-22 18:41:51.000000000 +0100
++++ /home/users/hunter/rpm/BUILD/mkcdrec/Config.sh	2005-11-27 19:49:05.322075592 +0100
+@@ -1,3 +1,4 @@
++#!/bin/bash
+ # mkcdrec (C) Copyright 2000-2005 by Gratien D'haese - IT3 Consultants
+ # Please read LICENSE in the source directory
+ # Config.sh contains the variable parameters set by the end-user
+@@ -41,7 +42,7 @@
+ # You may fill in an absolute path to your preferred linux kernel - may be left
+ # empty (default). The bootflop.sh script will try to find your current kernel 
+ # instead (best effort method)
+-LINUX_KERNEL=""
++LINUX_KERNEL="/boot/vmlinuz-2.6.11.10-6"
+ 
+ # If you are working on ia64, you may fill in an absolute path to elilo.conf
+ # and elilo.efi directory
+@@ -58,7 +59,7 @@
+ # or " devfs=mount" (for Mandrake 8/9 with devfs support)
+ # see append= line in /etc/lilo.conf!
+ # KERNEL_APPEND="splash=0" in case you have a flickering boot sequence.
+-KERNEL_APPEND=""
++KERNEL_APPEND="panic=30 video=vesafb:ywrap,mtrr vga=781"
+ 
+ # Use the compress program of your choice (gzip, bzip2)
+ CMP_PROG=gzip
+@@ -92,7 +93,7 @@
+ 
+ # The initrd filesystem type to use (ext2, minix, romfs, cramfs)
+ # Must be compiled into the kernel (not a module).
+-INITRD_FS=ext2
++INITRD_FS=romfs
+ 
+ # The root filesystem type to use (ext2, ext3, minix)
+ ROOT_FS=ext2
+@@ -164,9 +165,11 @@
+ /var/log/lastlog
+ /mnt/*
+ /proc/*
++/sys/*
+ /excluded/mountpoint
+ /tmp/[BACKUP]
+-/home/mike/no_backup"
++/home/users/hunter/avi
++/home/users/hunter/mp3"
+ 
+ ##########################
+ # CD/DVD-Writer Settings #
+diff -ur /home/users/hunter/rpm/BUILD/mkcdrec/scripts/bootflop.sh /home/users/hunter/rpm/BUILD/mkcdrec/scripts/bootflop.sh
+--- /home/users/hunter/rpm/BUILD/mkcdrec/scripts/bootflop.sh	2005-04-10 16:59:39.000000000 +0200
++++ /home/users/hunter/rpm/BUILD/mkcdrec/scripts/bootflop.sh	2005-11-27 18:51:31.960599992 +0100
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ # Copyright (c) 2000-2005 by Gratien D'haese for mkcdrec
+ # Please read LICENSE in the mkCDrec top directory
+ # $Id$
+diff -ur /home/users/hunter/rpm/BUILD/mkcdrec/scripts/dispatch.sh /home/users/hunter/rpm/BUILD/mkcdrec/scripts/dispatch.sh
+--- /home/users/hunter/rpm/BUILD/mkcdrec/scripts/dispatch.sh	2005-01-19 20:46:16.000000000 +0100
++++ /home/users/hunter/rpm/BUILD/mkcdrec/scripts/dispatch.sh	2005-11-27 13:51:43.046755656 +0100
+@@ -2,7 +2,8 @@
+ . ./Config.sh 2>/dev/null
+ 
+ # check architecture is supported:
+-GetBootArch
++#GetBootArch
++barch=x86
+ if [ "${barch}" = "Unsupported" ]; then
+    echo "Fatal: Architecture NOT supported by mkCDrec." | tee -a ${LOG}
+    exit 1
+diff -ur /home/users/hunter/rpm/BUILD/mkcdrec/scripts/initrd.sh /home/users/hunter/rpm/BUILD/mkcdrec/scripts/initrd.sh
+--- /home/users/hunter/rpm/BUILD/mkcdrec/scripts/initrd.sh	2005-11-09 22:18:49.000000000 +0100
++++ /home/users/hunter/rpm/BUILD/mkcdrec/scripts/initrd.sh	2005-11-27 18:34:29.565027744 +0100
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ # Copyright (c) 2000-2005 Gratien D'haese
+ # Please read LICENSE in the source directory
+ # $Id$
+diff -ur /home/users/hunter/rpm/BUILD/mkcdrec/scripts/mkmakeISO9660.sh /home/users/hunter/rpm/BUILD/mkcdrec/scripts/mkmakeISO9660.sh
+--- /home/users/hunter/rpm/BUILD/mkcdrec/scripts/mkmakeISO9660.sh	2004-02-29 19:42:23.000000000 +0100
++++ /home/users/hunter/rpm/BUILD/mkcdrec/scripts/mkmakeISO9660.sh	2005-11-27 13:58:30.560804104 +0100
+@@ -1,6 +1,8 @@
+ #!/bin/sh
+ # $Id$
+-. Config.sh 2>/dev/null
++cd /home/users/hunter/rpm/BUILD/mkcdrec
++. ./Config.sh
++#2>/dev/null
+ MKCDREC_DIR=`pwd`
+ SCRIPTS=${MKCDREC_DIR}/scripts
+ 
+diff -ur /home/users/hunter/rpm/BUILD/mkcdrec/scripts/rd-base.sh /home/users/hunter/rpm/BUILD/mkcdrec/scripts/rd-base.sh
+--- /home/users/hunter/rpm/BUILD/mkcdrec/scripts/rd-base.sh	2005-11-09 22:18:49.000000000 +0100
++++ /home/users/hunter/rpm/BUILD/mkcdrec/scripts/rd-base.sh	2005-11-27 19:29:46.620182224 +0100
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #======================================================
+ #	Make CD-ROM Recovery (mkCDrec)
+ #	Copyright (C) 2000-2005 by Gratien D'haese (IT3 Consultants)
+diff -ur /home/users/hunter/rpm/BUILD/mkcdrec/scripts/tar-it.sh /home/users/hunter/rpm/BUILD/mkcdrec/scripts/tar-it.sh
+--- /home/users/hunter/rpm/BUILD/mkcdrec/scripts/tar-it.sh	2005-11-05 16:29:38.000000000 +0100
++++ /home/users/hunter/rpm/BUILD/mkcdrec/scripts/tar-it.sh	2005-11-27 18:54:02.818666080 +0100
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ #       Make CD-ROM Recovery (Mkcdrec)
+ #       Copyright (C) 2000-2004 by Gratien D'haese (IT3 Consultants)
+ #       Please read LICENSE in the source directory
