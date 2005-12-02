@@ -1,4 +1,5 @@
 %define		_boot_arch		x86
+%define		_utils_version	0.7.9
 Summary:	mkCDrec (make CD-ROM Recovery) disaster recovery tool-set
 Summary(pl):	mkCDrec - zestaw narzêdzi do tworzenia p³yt do odtwarzania systemu po awarii
 Name:		mkcdrec
@@ -8,7 +9,10 @@ License:	GPL
 Group:		System/Tools
 Source0:	http://mkcdrec.ota.be/project/mkCDrec_v%{version}.tar.gz
 # Source0-md5:	0cbe2efbd083ce9745c5d5c5cea1c7c2
-##Source1: busybox-1.01.tar.bz2
+Source1:	http://mkcdrec.ota.be/project/mkCDrec_v%{_utils_version}_utils.tar.gz
+# Source1-md5:	3294f58cbc69532f4377224daa544174
+##Source10: busybox-1.01.tar.bz2
+Patch0:		%{name}-usebashizms.patch
 URL:		http://mkcdrec.ota.be/
 Requires:	MAKEDEV
 Provides:	perl(mkcdrec-lib.pl)
@@ -87,8 +91,8 @@ xfs i jfs. Metoda zwana "One Button Disaster Recovery" (OBDR) jest
 równie¿ wpierana.
 
 %prep
-%setup -q -n mkcdrec
-##%setup -n mkcdrec -a 1
+%setup -q -n mkcdrec -a 1
+%patch0 -p0 
 
 find . -name CVS | xargs rm -Rf
 
