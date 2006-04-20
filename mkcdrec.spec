@@ -1,3 +1,5 @@
+# TODO
+# - kill race in %post
 %define		_boot_arch		x86
 %define		_utils_version	0.7.9
 Summary:	mkCDrec (make CD-ROM Recovery) disaster recovery tool-set
@@ -6,7 +8,7 @@ Name:		mkcdrec
 Version:	0.8.9
 Release:	0.1
 License:	GPL
-Group:		System/Tools
+Group:		Applications
 Source0:	http://mkcdrec.ota.be/project/mkCDrec_v%{version}.tar.gz
 # Source0-md5:	0cbe2efbd083ce9745c5d5c5cea1c7c2
 Source1:	http://mkcdrec.ota.be/project/mkCDrec_v%{_utils_version}_utils.tar.gz
@@ -14,49 +16,32 @@ Source1:	http://mkcdrec.ota.be/project/mkCDrec_v%{_utils_version}_utils.tar.gz
 ##Source10: busybox-1.01.tar.bz2
 Patch0:		%{name}-usebashizms.patch
 URL:		http://mkcdrec.ota.be/
+BuildRequires:	gcc >= 5:2.96
 Requires:	MAKEDEV
 Provides:	perl(mkcdrec-lib.pl)
-%if %{_boot_arch}==ia64
-BuildRequires:	gcc >= 5:2.96
-Requires:	ash
-Requires:	/sbin/chkconfig
-Requires:	cdrtools
-Requires:	cdrtools-mkisofs
+%if %{_boot_arch} == ia64
 Requires:	fileutils
 Requires:	mtools
 Requires:	parted >= 1.6
-Requires:	perl-base >= 1:5.0
-Requires:	rsync
-Requires:	tar
-Requires:	util-linux >= 2.11
 %endif
-%if %{_boot_arch}==x86_64
-BuildRequires:	gcc >= 5:2.96
-Requires:	ash
-Requires:	cdrtools
-Requires:	cdrtools-mkisofs
+%if %{_boot_arch} == x86_64
 Requires:	fileutils
-Requires:	perl-base >= 1:5.0
-Requires:	rsync
 Requires:	syslinux
-Requires:	tar
-Requires:	util-linux >= 2.11
 %endif
-%if %{_boot_arch}==x86
-BuildRequires:	gcc >= 5:2.96
+%if %{_boot_arch} == x86
 BuildRequires:	syslinux >= 1.60
-Requires:	ash
 Requires:	coreutils
-Requires:	cdrtools
-Requires:	cdrtools-mkisofs
-Requires:	perl-base >= 1:5.0
-Requires:	rsync
 Requires:	syslinux
-Requires:	tar
-Requires:	util-linux >= 2.11
 %endif
 Requires(post):	coreutils
 Requires(post):	ed
+Requires:	ash
+Requires:	cdrtools
+Requires:	cdrtools-mkisofs
+Requires:	perl-base >= 1:5.0
+Requires:	rsync
+Requires:	tar
+Requires:	util-linux >= 2.11
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_prefix			/var/opt/mkcdrec
@@ -91,8 +76,8 @@ xfs i jfs. Metoda zwana "One Button Disaster Recovery" (OBDR) jest
 równie¿ wpierana.
 
 %prep
-%setup -q -n mkcdrec -a 1
-%patch0 -p0 
+%setup -q -n %{name} -a 1
+%patch0 -p0
 
 find . -name CVS | xargs rm -Rf
 
@@ -117,7 +102,7 @@ for fname in busybox*/busybox  busybox*/busybox.links; do
 	install -m 755 $fname $RPM_BUILD_ROOT%{_prefix}/busybox
 done
 
-install -m 755 busybox*/applets/install.sh $RPM_BUILD_ROOT%{_prefix}/busybox/applets
+install busybox*/applets/install.sh $RPM_BUILD_ROOT%{_prefix}/busybox/applets
 
 for fname in  cutstream*/cutstream \
  pastestream*/pastestream mediacheck/checkisomd5 mediacheck/implantisomd5
@@ -163,7 +148,7 @@ for fname in `find . -type f -maxdepth 1`; do
 	install -m 755  $fname $RPM_BUILD_ROOT%{_prefix}/$fname
 done
 
-install -m 644 doc/mkcdrec.8 $RPM_BUILD_ROOT%{_mandir}/man8
+install doc/mkcdrec.8 $RPM_BUILD_ROOT%{_mandir}/man8
 
 for file in \
     $RPM_BUILD_ROOT%{_prefix}/.cvsignore \
@@ -208,6 +193,7 @@ fi
 install -m 750 %{_prefix}/contributions/mkcdrec /usr/sbin/mkcdrec
 
 %postun
+if [ "$1" = 0 ]; then
 # we remove mkcdrec from webmin root's ACL
 
 if [ -f %{_webmin_access_file} ]; then
@@ -220,6 +206,7 @@ EOF
 fi
 # rm the mkcdrec wrapper
 rm -f /usr/sbin/mkcdrec
+fi
 
 %files
 %defattr(644,root,root,755)
