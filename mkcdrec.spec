@@ -3,7 +3,7 @@
 %define		_boot_arch		x86
 %define		_utils_version	0.7.9
 Summary:	mkCDrec (make CD-ROM Recovery) disaster recovery tool-set
-Summary(pl):	mkCDrec - zestaw narzêdzi do tworzenia p³yt do odtwarzania systemu po awarii
+Summary(pl.UTF-8):   mkCDrec - zestaw narzÄ™dzi do tworzenia pÅ‚yt do odtwarzania systemu po awarii
 Name:		mkcdrec
 Version:	0.8.9
 Release:	0.1
@@ -62,18 +62,18 @@ partition layout itself). Currently, ext2, ext3, minix, msdos, fat,
 vfat, reiserfs, xfs and jfs filesystems are supported. One Button
 Disaster Recovery (OBDR) is also supported as recovery method.
 
-%description -l pl
+%description -l pl.UTF-8
 mkCDrec (Make CDROM Recovery) tworzy uruchamialny (El Torito) obraz
-zawieraj±cy kopiê zapasow± systemu na jednej lub wiêkszej liczbie
-p³ytek CD-ROM. Zamiast wielu p³ytek mo¿na pos³u¿yæ siê innym dyskiem,
-NFS-em lub kopi± na ta¶mie. Po awarii systemu albo wej¶ciu intruza
-system mo¿e byæ uruchomiony z p³ytki i przywrócony do pierwotnego
-stanu. mkcdrec obs³uguje klonowanie systemu, pozwalaj±ce na
-odtworzenie dysku z innego dysku (dysk docelowy nie musi byæ tego
-samego rozmiaru, rozk³ad partycji jest przeliczany). Aktualnie mo¿na
-u¿ywaæ systemów plików ext2, ext3, minix, msdos, fat, vfat, reiserfs,
+zawierajÄ…cy kopiÄ™ zapasowÄ… systemu na jednej lub wiÄ™kszej liczbie
+pÅ‚ytek CD-ROM. Zamiast wielu pÅ‚ytek moÅ¼na posÅ‚uÅ¼yÄ‡ siÄ™ innym dyskiem,
+NFS-em lub kopiÄ… na taÅ›mie. Po awarii systemu albo wejÅ›ciu intruza
+system moÅ¼e byÄ‡ uruchomiony z pÅ‚ytki i przywrÃ³cony do pierwotnego
+stanu. mkcdrec obsÅ‚uguje klonowanie systemu, pozwalajÄ…ce na
+odtworzenie dysku z innego dysku (dysk docelowy nie musi byÄ‡ tego
+samego rozmiaru, rozkÅ‚ad partycji jest przeliczany). Aktualnie moÅ¼na
+uÅ¼ywaÄ‡ systemÃ³w plikÃ³w ext2, ext3, minix, msdos, fat, vfat, reiserfs,
 xfs i jfs. Metoda zwana "One Button Disaster Recovery" (OBDR) jest
-równie¿ wpierana.
+rÃ³wnieÅ¼ wpierana.
 
 %prep
 %setup -q -n %{name} -a 1
