@@ -3,7 +3,7 @@
 %define		_boot_arch		x86
 %define		_utils_version	0.7.9
 Summary:	mkCDrec (make CD-ROM Recovery) disaster recovery tool-set
-Summary(pl.UTF-8):   mkCDrec - zestaw narzędzi do tworzenia płyt do odtwarzania systemu po awarii
+Summary(pl.UTF-8):	mkCDrec - zestaw narzędzi do tworzenia płyt do odtwarzania systemu po awarii
 Name:		mkcdrec
 Version:	0.8.9
 Release:	0.1
