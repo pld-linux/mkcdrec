@@ -77,7 +77,7 @@ również wpierana.
 
 %prep
 %setup -q -n %{name} -a 1
-%patch0 -p0
+%patch -P0 -p0
 
 find . -name CVS | xargs rm -Rf
 
